@@ -1,39 +1,69 @@
 <template>
-  <form @submit.prevent="submit">
-    <div>
-      <label htmlFor="name">Name</label>
-      <input id="name" v-model="form.name" type="text" />
-    </div>
-    <div>
-      <label htmlFor="name">Email</label>
-      <input id="email" v-model="form.email" type="email" />
-    </div>
-    <div>
-      <label htmlFor="imgUrl">Image URL</label>
-      <input id="imgUrl" v-model="form.imageUrl" type="text" />
-    </div>
-    <div>
-      <button>Save Contact</button>
-    </div>
-  </form>
+  <MDBRow class="my-3">
+    <MDBCol col="12" lg="6" class="m-auto">
+      <BaseAlert :alert="alertProps" />
+      <form @submit.prevent="submit">
+        <!-- Name input -->
+        <MDBInput
+          type="text"
+          label="Name"
+          id="name"
+          v-model="form.name"
+          wrapperClass="mb-4"
+        />
+
+        <!-- Email input -->
+        <MDBInput
+          type="email"
+          label="Email address"
+          id="email"
+          v-model="form.email"
+          wrapperClass="mb-4"
+        />
+        <!-- ImageUrl input -->
+        <MDBInput
+          type="text"
+          label="Image Url"
+          id="imageUrl"
+          v-model="form.imageUrl"
+          wrapperClass="mb-4"
+        />
+        <!-- Submit button -->
+        <MDBBtn type="submit" color="dark" block class="mb-4"> Save </MDBBtn>
+      </form>
+    </MDBCol>
+  </MDBRow>
 </template>
 
 <script setup lang="ts">
+import { MDBContainer, MDBRow, MDBCol, MDBInput, MDBBtn } from 'mdb-vue-ui-kit';
+import BaseAlert from './alert/BaseAlert.vue';
 import { Meteor } from 'meteor/meteor';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
+//types
 import Contact from '../../types/Contact';
+import Alert from '../../types/Alert';
 
 const initForm = { name: '', email: '', imageUrl: '' };
+const alertProps = ref<Alert>();
 const form = reactive<Contact>(initForm);
 const submit = () => {
   Meteor.call('contact.insert', form, (errorResponse) => {
     if (errorResponse) {
-      alert(errorResponse.error);
+      alertProps.value = { msg: errorResponse.error, type: 'error' };
+    } else {
+      alertProps.value = {
+        msg: 'Contact is created successfully.',
+        type: 'success',
+      };
+      form.name = '';
+      form.email = '';
+      form.imageUrl = '';
+      setTimeout(() => {
+        alertProps.value = undefined;
+      }, 3000);
     }
   });
-  form.name = '';
-  form.email = '';
-  form.imageUrl = '';
 };
 </script>
 

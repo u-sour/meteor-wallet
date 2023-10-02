@@ -21,14 +21,21 @@
               <div class="ms-3">
                 <p class="fw-bold mb-1">{{ c.name }}</p>
                 <p class="text-muted mb-0">{{ c.email }}</p>
+                <p class="text-muted mb-0">{{ c.walletId }}</p>
               </div>
             </div>
             <a
+              class="btn btn-light btn-rounded btn-sm"
+              role="button"
+              @click="archive(c._id)"
+              >Archive</a
+            >
+            <!-- <a
               class="btn btn-danger btn-rounded btn-sm"
               role="button"
               @click="remove(c._id)"
               >Remove</a
-            >
+            > -->
           </div>
         </MDBCardBody>
       </MDBCard>
@@ -53,11 +60,17 @@ import {
 } from 'mdb-vue-ui-kit';
 import { Meteor } from 'meteor/meteor';
 import { subscribe, autorun } from 'vue-meteor-tracker';
-import { ContactsCollection } from '../../api/ContactsCollection';
-const isLoading = subscribe('allContacts');
-const contacts = autorun(() => ContactsCollection.find().fetch()).result;
-console.log('🚀 ~ file: ContactList.vue:20 ~ contacts:', contacts.value);
-const remove = (id: string) => Meteor.call('contact.remove', id);
+import { ContactsCollection } from '../../api/collections/ContactsCollection';
+const isLoading = subscribe('contacts');
+const contacts = autorun(() =>
+  ContactsCollection.find(
+    { archived: { $ne: true } },
+    { sort: { createdAt: -1 } },
+  ).fetch(),
+).result;
+
+const archive = (id: string) => Meteor.call('contact.archive', id);
+// const remove = (id: string) => Meteor.call('contact.remove', id);
 </script>
 
 <style scoped></style>

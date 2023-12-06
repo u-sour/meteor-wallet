@@ -8,6 +8,7 @@ const ContactsSchema = new SimpleSchema({
   imageUrl: { type: String, optional: true },
   walletId: { type: String },
   createdAt: { type: Date },
+  userId: { type: String },
 });
 
 ContactsCollection.attachSchema(ContactsSchema);

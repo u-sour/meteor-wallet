@@ -1,7 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 import { WalletsCollection } from '../collections/WalletsCollection';
 
-Meteor.publish('allWallets', function () {
+Meteor.publish('myWallet', function () {
   //   return ContactsCollection.find({ userId: this.userId });
-  return WalletsCollection.find({});
+  const { userId } = this;
+  if (!userId) {
+    throw Meteor.Error('Not authorized.')
+  }
+  return WalletsCollection.find({ userId });
 });

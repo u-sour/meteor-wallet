@@ -1,4 +1,7 @@
 import { Meteor } from 'meteor/meteor';
+import { Roles } from 'meteor/alanning:roles';
+import { WalletRoles } from '../roles/WalletRole';
+
 import {
   TransactionsCollection,
   TRANSFER_TYPE,
@@ -11,15 +14,14 @@ Meteor.methods({
   //   return ContactsCollection.find(selector).fetch();
   // },
   'transactions.insert': (isTransferring, form) => {
-    console.log(
-      '🚀 ~ file: TransactionsMethods.js:10 ~ isTransferring:',
-      isTransferring,
-    );
+    if (!Meteor.userId()) {
+      throw new Meteor.Error('Not authorized.');
+    }
     form.type = isTransferring ? TRANSFER_TYPE : ADD_TYPE;
-    console.log('🚀 ~ file: TransactionsMethods.js:10 ~ form:', form);
+    form.userId = Meteor.userId()
     const transferSchema = new SimpleSchema({
       sourceWalletId: { type: String },
-      destinationWallet: { type: String, optional: isTransferring },
+      destinationContactId: { type: String, optional: isTransferring },
       amount: { type: Number, min: 1 },
       type: { type: String },
     });
@@ -32,11 +34,20 @@ Meteor.methods({
     schema.validate(cleanForm);
     return TransactionsCollection.insert(form);
   },
-  // 'contact.remove': (contactId) => {
-  //   check(contactId, String);
-  //   return ContactsCollection.remove(contactId);
-  // },
+  'transactions.remove': (transactionId) => {
+    if (!Meteor.userId()) {
+      throw new Meteor.Error('Not authorized.');
+    }
+
+    if (!Roles.userIsInRole(Meteor.userId(), WalletRoles.ADMIN)) {
+      throw new Meteor.Error('Permission denied.')
+    }
+    return TransactionsCollection.remove(transactionId);
+  },
   // 'contact.archive': (contactId) => {
+  //   if (!Meteor.userId()) {
+  //     throw new Meteor.Error('Not authorized.');
+  //   }
   //   check(contactId, String);
   //   return ContactsCollection.update(
   //     { _id: contactId },

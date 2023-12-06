@@ -7,6 +7,9 @@ Meteor.methods({
     return ContactsCollection.find(selector).fetch();
   },
   'contact.insert': (form) => {
+    if (!Meteor.userId()) {
+      throw new Meteor.Error('Not authorized.');
+    }
     check(form.name, String);
     check(form.email, String);
     check(form.imageUrl, String);
@@ -17,13 +20,20 @@ Meteor.methods({
     if (!form.walletId) {
       throw new Meteor.Error('Wallet ID is required.');
     }
+    form.userId = Meteor.userId()
     return ContactsCollection.insert(form);
   },
   'contact.remove': (contactId) => {
+    if (!Meteor.userId()) {
+      throw new Meteor.Error('Not authorized.');
+    }
     check(contactId, String);
     return ContactsCollection.remove(contactId);
   },
   'contact.archive': (contactId) => {
+    if (!Meteor.userId()) {
+      throw new Meteor.Error('Not authorized.');
+    }
     check(contactId, String);
     return ContactsCollection.update(
       { _id: contactId },

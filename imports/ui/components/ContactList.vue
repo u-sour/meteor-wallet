@@ -61,7 +61,7 @@ import {
 import { Meteor } from 'meteor/meteor';
 import { subscribe, autorun } from 'vue-meteor-tracker';
 import { ContactsCollection } from '../../api/collections/ContactsCollection';
-const isLoading = subscribe('contacts');
+const isLoading = subscribe('myContacts');
 const contacts = autorun(() =>
   ContactsCollection.find(
     { archived: { $ne: true } },

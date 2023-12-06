@@ -1,7 +1,7 @@
 interface Wallet {
   amount: number;
   sourceWalletId: string;
-  destinationWalletId?: string;
+  destinationContactId?: string;
   createdAt: Date;
 }
 
